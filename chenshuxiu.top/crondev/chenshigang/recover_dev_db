@@ -1,0 +1,66 @@
+#!/bin/bash
+if [ $# -lt 1 ]; then
+    echo 'usage: ./recover_dev_db [filename]'
+    echo 'example: ./recover_dev_db 2016112112'
+    exit 1
+fi
+
+filename=$1".sql.gz"
+sqlname=$1".sql"
+
+if [ -e $filename ]; then
+    rm -f $filename
+fi
+
+if [ -e $sqlname ]; then
+    rm -f $sqlname
+fi
+
+begin=`date +%s`
+echo "下载数据..."
+scp -P 22 -r $USER@fangcun001:/home/xdata/dbbak/$filename ./
+
+if [ ! -e $filename ]; then
+    echo $filename" 不存在"
+    exit 1
+fi
+
+echo "下载完毕"
+echo "开始解压..."
+gunzip $filename
+echo "解压完毕"
+
+#########不清洗数据的便捷方案
+
+echo "开始导入开发库数据..."
+mysql -ufcdev -pfcdev fcqxdb < $sqlname
+end=`date +%s`
+rm $sqlname
+echo "共花费"$(($end - $begin))"秒"
+
+
+exit
+########
+
+echo "开始导入临时库数据..."
+mysql -ufcdev -pfcdev -e "DROP DATABASE IF EXISTS fcqxdb_tmp; CREATE DATABASE fcqxdb_tmp CHARACTER SET utf8 COLLATE utf8_bin;"
+mysql -ufcdev -pfcdev fcqxdb_tmp < $sqlname
+echo "导入临时库数据完毕"
+echo "开始清洗数据..."
+#/usr/bin/php  CleanDb.php
+echo "开始导出临时库数据..."
+mysqldump -ufcdev -pfcdev fcqxdb_tmp > fcqxdb_tmp.sql
+if [ ! -e "fcqxdb_tmp.sql" ]; then
+    echo "导出临时库数据失败"
+    exit 1
+fi
+echo "开始导入开发库数据..."
+mysql -ufcdev -pfcdev fcqxdb < fcqxdb_tmp.sql
+echo "开发库数据导入完毕"
+end=`date +%s`
+rm $sqlname
+rm fcqxdb_tmp.sql
+echo "共花费"$(($end - $begin))"秒"
+
+
+

@@ -1,0 +1,50 @@
+{
+    "button": [
+        {
+            "name": "我要",
+            "sub_button": [
+                {
+                    "name": "报到",
+                    "type": "view",
+                    "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx82b2c2069b5a8c05&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Fpatient%2Fnew%3Fgh%3Dgh_b185f11b36e8&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+                },
+                {
+                    "name": "记日记",
+                    "type": "view",
+                    "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx82b2c2069b5a8c05&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Fpatientnote%2Fadd%3Fgh%3Dgh_b185f11b36e8&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+                }
+            ]
+        },
+
+        {
+            "name": "我的",
+            "sub_button": [
+                {
+                    "name": "日记",
+                    "type": "view",
+                    "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx82b2c2069b5a8c05&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Fpatientnote%2Flist%3Fgh%3Dgh_b185f11b36e8&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+                },
+                {
+                    "name": "资料",
+                    "type": "view",
+                    "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx82b2c2069b5a8c05&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Fwxpicmsgmgr%2Flist%3Fgh%3Dgh_b185f11b36e8&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+                }
+            ]
+        },
+
+        {
+            "name": "课程",
+            "sub_button": [
+                {
+                    "name": "视神经脊髓炎课程",
+                    "type": "view",
+                    "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx82b2c2069b5a8c05&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Flesson%2Frefada%3Fgh%3Dgh_b185f11b36e8%26courseid%3D101561077&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+                },{
+                    "name": "多发性硬化课程",
+                    "type": "view",
+                    "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx82b2c2069b5a8c05&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Flesson%2Frefada%3Fgh%3Dgh_b185f11b36e8%26courseid%3D102015455&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+                }
+            ]
+        }
+    ]
+}

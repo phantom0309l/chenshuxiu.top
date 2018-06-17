@@ -1,0 +1,2 @@
+<input type="hidden" id="patientid" name="patientid" value="<?=$patientid?>">
+<input class="form-control" type="text" name="patient_name" id="patient-listcond-word" placeholder="患者姓名/拼音/ID/手机" value="<?=$patient_name?>">

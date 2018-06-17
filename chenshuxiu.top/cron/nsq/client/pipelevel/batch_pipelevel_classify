@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+
+import pymysql
+import time
+import socket
+import os
+import logging
+import logging.handlers
+import sys
+import contextlib
+import requests
+import json
+'''
+扔进消息队列的内容
+{
+    'labels': [1,0,1,0],
+    'pipelevelids': [1,2,3,4,5],
+}
+'''
+curr_dir = os.path.dirname(os.path.realpath(__file__))
+data_dir = os.path.join(curr_dir, 'data')
+if not os.path.exists(data_dir):
+    os.mkdir(data_dir)
+offsetid_file = os.path.join(data_dir, 'offsetid')
+log_dir = os.path.join(curr_dir, 'log')
+if not os.path.exists(log_dir):
+    os.mkdir(log_dir)
+log_file = os.path.join(log_dir, 'batch.log')
+
+'''数据库配置'''
+config = {
+    'dev': {
+        'mysql': {
+            'host': 'fangcundev',
+            'port': 3306,
+            'user': 'fcdev',
+            'password': 'fcdev',
+            'database': 'fcqxdb',
+            'charset': 'utf8mb4',
+            'cursorclass': pymysql.cursors.DictCursor,
+        },
+        'nsq_server_url': 'http://fangcundev:4151/pub?topic=pipelevel',
+        'classify_url': 'http://10.30.95.230:5050/classify',
+        'time_wait': 30,
+    },
+    'pro': {
+        'mysql': {
+            'host': 'fangcun003',
+            'port': 3306,
+            'user': 'fcdev',
+            'password': 'fcdev',
+            'database': 'fcqxdb',
+            'charset': 'utf8mb4',
+            'cursorclass': pymysql.cursors.DictCursor,
+        },
+        'nsq_server_url': 'http://fangcun002:4151/pub?topic=pipelevel',
+        'classify_url': 'http://10.30.95.230:5050/classify',
+        'time_wait': 300,
+    }
+}
+
+ROWS_LIMIT = 100
+
+#设置日志
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('main')
+logger.setLevel(logging.DEBUG)
+formater = logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s')
+
+rh = logging.handlers.TimedRotatingFileHandler(log_file,when='D',interval=1, backupCount=30)
+rh.setLevel(level=logging.INFO)
+rh.setFormatter(formater)
+rh.suffix = "%Y%m%d_%H%M%S"
+logger.addHandler(rh)
+
+def get_config(key):
+    hostname = socket.gethostname()
+    return config['pro'][key] if hostname == 'fangcun001' else config['dev'][key]
+
+
+@contextlib.contextmanager
+def connect_mysql():
+    conf = get_config('mysql')
+    logger.info('start connect to mysql')
+    conn = pymysql.connect(**conf)
+    logger.info('connect success')
+    cursor = conn.cursor()
+    try:
+        yield cursor
+    finally:
+        logger.info('connect closed')
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+def update_offsetid(offsetid):
+    with open(offsetid_file, 'w', encoding='utf-8') as fh:
+        fh.write(str(offsetid))
+
+def get_offsetid():
+    with open(offsetid_file, 'r', encoding='utf-8') as fh:
+        c = fh.read()
+        offsetid = int(c.strip()) if c.strip() is not  '' else 0
+    return offsetid
+
+def get_contents_pipelevelids(isinit=False):
+    with connect_mysql() as cur:
+        offsetid = 0
+        if isinit == False and os.path.isfile(offsetid_file):
+            offsetid = get_offsetid()
+        else:
+            isinit = False
+        sql = '''SELECT a.id AS pipelevelid, a.pipeid AS pipeid, c.content AS content FROM pipelevels a
+        INNER JOIN pipes b ON a.pipeid=b.id
+        INNER JOIN wxtxtmsgs c ON b.objtype='WxTxtMsg' AND b.objid=c.id
+        WHERE is_urgent=0 AND a.id > {} ORDER BY a.id ASC limit {}'''.format(offsetid, ROWS_LIMIT)
+        logger.info('execute sql offsetid is {}'.format(offsetid))
+        cur.execute(sql)
+
+        rows = cur.fetchall()
+        if len(rows) < 1:
+            return [], [], isinit, offsetid
+
+        pipelevelids = [row['pipelevelid'] for row in rows]
+        contents = [row['content'] for row in rows]
+
+        offsetid = pipelevelids[-1:][0]
+    return contents, pipelevelids, isinit, offsetid
+
+def predict(contents):
+    url = get_config('classify_url')
+    d = {'content': json.dumps(contents)}
+    logger.info('send classify task to {}'.format(url))
+    try:
+        r = requests.post(url, data=d)
+    except requests.exceptions.ConnectionError as e:
+        logger.critical(e)
+        return [], []
+
+    logger.info('ret is {}'.format(r.text))
+    ret = json.loads(r.text, encoding='utf-8')
+    labels = ret.get('data').get('labels')
+    segs = ret.get('data').get('segs')
+    return labels, segs
+
+def send_to_nsq(labels, pipelevelids):
+    if len(labels) != len(pipelevelids):
+        logger.critical('labels length is not equal to pipelevelids, will not send to nsq')
+        return
+    #d = [{'label':m, 'id':n} for m, n in zip(labels, pipelevelids)]
+    d = {'labels':labels, 'pipelevelids':pipelevelids}
+    logger.info(d)
+    postdata = json.dumps(d)
+    url = get_config('nsq_server_url')
+    try:
+        r = requests.post(url, data=postdata)
+        logger.info('send to nsq {} ret is {}'.format(url, r.text))
+    except requests.exceptions.ConnectionError as e:
+        logger.critical(e)
+        return False
+    return True
+
+
+if __name__ == '__main__':
+    isinit = True if len(sys.argv) > 1 and sys.argv[1] == 'init' else False
+    time_wait = get_config('time_wait')
+    while 1:
+        contents, pipelevelids, isinit, offsetid = get_contents_pipelevelids(isinit)
+        if len(contents) > 0:
+            labels, segs = predict(contents)
+            if len(labels) > 0:
+                if send_to_nsq(labels, pipelevelids):
+                    #更新offsetid
+                    update_offsetid(offsetid)
+                else:
+                    logger.critical('send to nsq failed, do not update offsetid file')
+            else:
+                logger.critical('labels is empty, classify failed. do not update offsetid file')
+        else:
+            logger.warning('there is no more unmarked data. content length is 0')
+        logger.info('waiting for {} seconds'.format(time_wait))
+        time.sleep(time_wait)

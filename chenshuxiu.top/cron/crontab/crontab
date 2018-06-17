@@ -1,0 +1,378 @@
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+# m h dom mon dow user	command
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+
+########################
+#备份脚本
+
+#每天0点切割nginx日志
+0 0 * * *   root  /bin/bash /home/www/dev/fangcunyisheng.com/cron/sh/nginxlog_backup.sh
+
+#每天0点1分压缩xworklog
+1 0 * * *   www  cd /home/xworklog/www/fangcunyisheng.com && /bin/sh backup.sh >> backup.log
+
+#每天, 晚上, 数据库备份
+1 1 * * *   root  /home/www/dev/fangcunyisheng.com/cron/sh/dbbackup.sh
+
+#每天, 中午, 数据库备份
+1 12 * * *   root  /home/www/dev/fangcunyisheng.com/cron/sh/dbbackup.sh
+
+########################
+#每分钟, 监控网站首页是否能正常访问
+#* * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/webservice_monitor.php >> /home/nginxlog/cronlog/webservice_monitor.log &
+
+########################
+#每1分钟, 抓取没有详情的wxusers
+* * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/wxuserfetch.php >> /home/nginxlog/cronlog/wxuserfetch.log &
+
+#每分钟, 补抓5分钟前的微信发得图片
+* * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/wxpicmsgfetch.php >> /home/nginxlog/cronlog/wxpicmsgfetch.log &
+
+#每分钟, 扫码关注后5分钟还没报到，且没发送过5分钟催报到消息的，发一次催报到消息
+* * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cuibaodao_cancer_m2.php >> /home/nginxlog/cronlog/cuibaodao_cancer_m2.log &
+
+#每分钟, 扫描快速咨询表，查看是否有超时的咨询
+* * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cron_order_QuickConsultOrder.php >> /home/nginxlog/cronlog/cron_order_QuickConsultOrder.log &
+
+#每分钟, 扫描快速通行证消息任务，查看是否有超时的任务
+#* * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cron_quickpass_timeout.php >> /home/nginxlog/cronlog/cron_quickpass_timeout.log &
+
+#每2分钟, plan_txtmsg 定时消息发送
+*/2 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cron_plan_txtmsg.php >> /home/nginxlog/cronlog/cron_plan_txtmsg.log &
+
+#每5分钟, pushmsg 消息补漏
+*/5 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cron_pushmsg.php >> /home/nginxlog/cronlog/cron_pushmsg.log &
+
+#每5分钟, dwx_kefumsg 消息补漏
+*/5 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cron_dwx_kefumsg.php >> /home/nginxlog/cronlog/cron_dwx_kefumsg.log &
+
+#每5分钟, cron_30minute_notpay 每5分钟, 药门诊下单且30分钟未支付的患者生成一条订单跟进任务，患者进商业组
+*/5 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cron_30minute_notpay.php >> /home/nginxlog/cronlog/cron_30minute_notpay.log &
+
+#每10分钟, 根据手机号计算省市名称, 没记录 crontab 和 cronlog
+#*/10 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/newuser_citystr_fix.php >> /home/nginxlog/cronlog/newuser_citystr_fix.log &
+
+#每10分钟, 对当天[6, 18)扫码关注但没报到的用户催报到, 每个wxuser一天只催一次
+*/10 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cuibaodao_m1.php >> /home/nginxlog/cronlog/cuibaodao_m1.log &
+
+#每10分钟, 对大于等于47小时30分钟 小于48小时的扫码关注但没报到的用户催报到
+*/10 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cuibaodao_m2.php >> /home/nginxlog/cronlog/cuibaodao_m2.log &
+
+#每10分钟，对prescription进行自动审核
+*/10 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/prescription_auto_audit.php >> /home/nginxlog/cronlog/prescription_auto_audit.log &
+
+#每10钟, 对扫码关注2小时没报到的用户催报到，每个wxuser只催一次(肿瘤方向)
+*/10 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/cuibaodao_cancer_m.php >> /home/nginxlog/cronlog/cuibaodao_cancer_m.log &
+
+#每10分钟, 将一小时前的未支付的充值单, 主动查询一下结果
+*/10 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/shoporder_pay_orderquery.php >> /home/nginxlog/cronlog/shoporder_pay_orderquery.log &
+
+#每10分钟, (20180611前 每天, 22:30), 和海南处方系统同步数据
+*/10 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/chufang/ZsglrjProcess.php >> /home/nginxlog/cronlog/ZsglrjProcess.log &
+
+#每23分钟，向erp进行订单推送
+*/23 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/shoppkg_push_erp.php >> /home/nginxlog/cronlog/shoppkg_push_erp.log &
+
+#每34分钟,从erp拉取数据,做快递单号提醒等操作
+*/34 * * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/minute/shoppkg_pull_erp.php >> /home/nginxlog/cronlog/shoppkg_pull_erp.log &
+
+########################
+#每小时执行的脚本
+
+#每1小时, 流汇总消息, 发送到关注的运营
+0 8-23/1 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/hourly/pipe_summary.php >> /home/nginxlog/cronlog/pipe_summary.log &
+
+#每1小时, 流汇总消息, 发送到关注的运营
+20 8-21/1 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/hourly/lilly_optask_watch.php >> /home/nginxlog/cronlog/lilly_optask_watch.log &
+
+#每1小时, 修正patients表字段 subscribe_cnt 和 wxuser_cnt
+10 * * * *   www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/hourly/dbfix_patient_subscribe_cnt.php >> /home/nginxlog/cronlog/dbfix_patient_subscribe_cnt.log &
+
+########################
+#每日执行的脚本
+
+#每天, 00:05 check_hangup_time_out 对挂起任务做挂起超时处理
+5 0 * * *   www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/check_hangup_time_out.php >> /home/nginxlog/cronlog/check_hangup_time_out.log &
+
+#每天, 00:15 rpt_date_db 统计各表数据情况
+15 0 * * *   www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/rpt_date_db_process.php >> /home/nginxlog/cronlog/rpt_date_db_process.log &
+
+#每天, 00:25 礼来经销商数据传输
+25 0 * * *   www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/create_lilly_shoporder_data.php >> /home/nginxlog/cronlog/create_lilly_shoporder_data.log &
+
+#每天, 00:30 create_not_revisittkt_notime_optask 检查门诊后2天到门诊日期前7天,系统是否有患者的门诊记录。如果没有门诊记录则生成【未如约复诊任务】
+30 0 * * *   www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/create_not_revisittkt_notime_optask.php >> /home/nginxlog/cronlog/create_not_revisittkt_notime_optask.log &
+
+#每天, 01:00 (肿瘤)昨日患者报表汇总
+15 1 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/rpt_day_doctor_data_cancer.php >> /home/nginxlog/cronlog/rpt_day_doctor_data_cancer.log &
+
+#每天, 01:15 rpt_ppgroup 数据报表汇总
+15 1 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/rpt_ppgroup_process.php >> /home/nginxlog/cronlog/rpt_ppgroup_process.log &
+
+#每天, 01:30 rpt_patient 数据报表汇总
+31 1 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/rpt_patient_process.php >> /home/nginxlog/cronlog/rpt_patient_process.log &
+
+#每天, 01:45 自动化关闭任务
+45 1 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/auto_to_opnode.php >> /home/nginxlog/cronlog/auto_to_opnode.log &
+
+#每天, 02:00, 抓取遗漏的wxusers
+1 2 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/wxuserlistfetch.php >> /home/nginxlog/cronlog/wxuserlistfetch.log &
+
+#每天, 02:10, 抓取手机号对应的省市
+11 2 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/linkmanfetch.php >> /home/nginxlog/cronlog/linkmanfetch.log &
+
+#每天, 02:30 rpt_week_doctor_patient 数据报表汇总
+31 2 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/rpt_week_doctor_patient_process.php >> /home/nginxlog/cronlog/rpt_week_doctor_patient_process.log &
+
+#每天, 02:41 rpt_week_ketang 数据报表汇总
+41 2 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/rpt_week_ketang_process.php >> /home/nginxlog/cronlog/rpt_week_ketang_process.log &
+
+#每天, 03:01 生成分组课程任务
+#1 3 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/optask_StudyPlan_hwk.php >> /home/nginxlog/cronlog/optask_StudyPlan_hwk.log &
+
+#每天, 03:30 更新wxuser分组 of adhd
+30 3 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/wxgroup_fix.php >> /home/nginxlog/cronlog/wxgroup_fix.log &
+
+#每天，医生开通了续方审核，但是48小时以上没有审核的，自动拒绝
+31 4 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/prescription_auto_refuse.php >> /home/nginxlog/cronlog/prescription_auto_refuse.log &
+
+#每天, 05:01 修补数据关联 wxuserid_userid_patientid
+1 5 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/dbfix_wxuserid_userid_patientid.php >> /home/nginxlog/cronlog/dbfix_wxuserid_userid_patientid.log &
+
+#每天, 05:31 抓取sfda国产药品
+31 5 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/Fetch_sfda_medicine.php >> /home/nginxlog/cronlog/Fetch_sfda_medicine.log &
+
+#每天, 06:01 抓取sfda进口药品
+1 6 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/Fetch_sfda_medicine_en.php >> /home/nginxlog/cronlog/Fetch_sfda_medicine_en.log &
+
+#每天, 06:30 查询（现在-3天 ~ 现在-2天）报到时间超过48h, 且报到后48h之内取消关注的患者, 直接记录为疑似无效患者；
+31 6 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/unsubscribe_patient_done.php >> /home/nginxlog/cronlog/unsubscribe_patient_done.log &
+
+#每天, 07:01 数据修补optasks中diseaseid
+01 7 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/dbfix_optasks_diseaseid.php >> /home/nginxlog/cronlog/dbfix_optasks_diseaseid.log &
+
+#每天, 07:10 数据清理 optasks, 清理测试数据
+10 7 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/dbfix_optasks_clean_testdata.php >> /home/nginxlog/cronlog/dbfix_optasks_clean_testdata.log &
+
+#每天, 07:20 生成 "药物到期提醒" 任务
+20 7 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/optask_remind_medicineBreak.php >> /home/nginxlog/cronlog/optask_remind_medicineBreak.log &
+
+#每天, 7:45 (非肿瘤)汇总前日患者流信息发送给医生(日报)
+45 7 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/pipe_summary_dwx.php >> /home/nginxlog/cronlog/pipe_summary_dwx.log &
+
+#每天, 7:48 (肿瘤)汇总前日患者流信息发送给医生(日报)
+45 7 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/send_rpt_day_cancer_doctor.php >> /home/nginxlog/cronlog/send_rpt_day_cancer_doctor.log &
+
+#每天, 07:50 检查sunflower项目患者的扫码情况。
+50 7 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_patient_check.php >> /home/nginxlog/cronlog/lilly_patient_check.log &
+
+#每天, 08:01 推送礼来患教文章
+01 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_patient_push_article.php >> /home/nginxlog/cronlog/lilly_patient_push_article.log &
+
+#每天, 08:02 给患者发送倍泰龙注射日记量表
+02 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/beitailong_send_paper.php >> /home/nginxlog/cronlog/beitailong_send_paper.log &
+
+#每天, 08:05 对昨天做过感统训练(且是目前系统中提交的最新一次)的用户发通知：课程已经更新
+#05 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/gantong_urge.php >> /home/nginxlog/cronlog/gantong_urge.log &
+
+#每天, 08:10 对昨天18点(包括)到今天6点(不包括)的扫码关注但没报到的用户催报到
+10 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/cuibaodao_d1.php >> /home/nginxlog/cronlog/cuibaodao_d1.log &
+
+#每天, 08:15 未购药跟进
+15 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/optask_nobuy_follow.php >> /home/nginxlog/cronlog/optask_nobuy_follow.log &
+
+#每天, 08:20 讲解入课规则
+20 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/patientpgroupref_join_notice.php >> /home/nginxlog/cronlog/patientpgroupref_join_notice.log &
+
+#每天, 08:25 按周期, 六院项目评估提醒
+25 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/scalenotice_pkuh6.php >> /home/nginxlog/cronlog/scalenotice_pkuh6.log &
+
+#每天, 08:30 按周期, 发送填写服药记录和SNAP-IV评估的提醒
+30 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/drugscalenotice.php >> /home/nginxlog/cronlog/drugscalenotice.log &
+
+#每天, 08:35 每天, 商业化正在用药任务
+35 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/optask_businessDrug_create.php >> /home/nginxlog/cronlog/optask_businessDrug_create.log &
+
+#每天, 08:40 按周期, 发送 合作患者的 填写服药记录和SNAP-IV评估的提醒以及催评估后3天未做提醒，7天未做生成运营任务，14天未做再提醒，21天未做置不活跃退出
+40 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_drugscalenotice.php >> /home/nginxlog/cronlog/lilly_drugscalenotice.log &
+
+#每天, 08:45 生成sunflower项目患者的4周、12周、24周基础用药任务
+45 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_patient_optask_basedrug.php >> /home/nginxlog/cronlog/lilly_patient_optask_basedrug.log &
+
+#每天, 08:50 向礼来接口推送每两周给医生的提醒消息
+50 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_doctor_notice.php >> /home/nginxlog/cronlog/lilly_doctor_notice.log &
+
+#每天, 08:55 患者入组超过7*26天时，记录结束时间，推送项目结束通知；
+55 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_patient_autoout.php >> /home/nginxlog/cronlog/lilly_patient_autoout.log &
+
+#每天, 08:59 合作患者顺利出组后，推送提醒文案；
+59 8 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_patient_after_autoout_notice.php >> /home/nginxlog/cronlog/lilly_patient_after_autoout_notice.log &
+
+#每天, 09:00 发送合作患者满意度调查问卷
+00 9 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_patient_survey.php >> /home/nginxlog/cronlog/lilly_patient_survey.log &
+
+#每天, 09:05 发送合作医生满意度调查问卷
+05 9 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_doctor_survey.php >> /home/nginxlog/cronlog/lilly_doctor_survey.log &
+
+#每天, 09:10 生成sunflower项目患者符合的电话任务
+#10 9 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/lilly_patient_optask_tel.php >> /home/nginxlog/cronlog/lilly_patient_optask_tel.log &
+
+#每天, 09:30 发送 靶向药定期核对（用药核对）
+50 9 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/optask_PatientMedicineCheck_patientmedicine_check.php >> /home/nginxlog/cronlog/optask_PatientMedicineCheck_patientmedicine_check.log &
+
+#每天, 09:50 发送 药物副反应检测
+50 9 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/optask_PmSideEffect_remind.php >> /home/nginxlog/cronlog/optask_PmSideEffect_remind.log &
+
+#每天, 9:55 发送任务的自动消息
+55 9 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/auto_send_optask_pro.php >> /home/nginxlog/cronlog/auto_send_optask_pro.log &
+
+#每天, 09:57 发送 评估提醒
+57 9 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/evaluate_remind_patient.php >> /home/nginxlog/cronlog/evaluate_remind_patient.log &
+
+#每天, 10:00 首次扫码后没关注第4天、8天、15天、22天…… 之后每7天发送一次
+0 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/cuibaodao_cancer_d.php >> /home/nginxlog/cronlog/cuibaodao_cancer_d.log &
+
+#每天, 10:01 发送 用药核对表格
+#1 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/patientmedicinesheet_send_patient.php >> /home/nginxlog/cronlog/patientmedicinesheet_send_patient.log &
+
+#每天, 10:03 发送 预约复诊提醒
+3 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/revisittkt_remind_patient.php >> /home/nginxlog/cronlog/revisittkt_remind_patient.log &
+
+#每天, 10:05 发送 预约复诊提醒 徐雁 vitD检查 #5310 停止这个消息的发送
+# 5 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/revisittkt_remind_xuyan_vitd.php >> /home/nginxlog/cronlog/revisittkt_remind_xuyan_vitd.log &
+
+#每天, 10:06 发送 预约复诊确认
+6 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/revisittkt_patient_confirm.php >> /home/nginxlog/cronlog/revisittkt_patient_confirm.log &
+
+#每天, 10:08, 给患者发送快速通行证到期提醒
+8 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/quickpass_service_expire_remind.php >> /home/nginxlog/cronlog/quickpass_service_expire_remind.log &
+
+#每天, 10:10 发送 秦燕项目患者填写记录表
+10 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/certican_remind_patient.php >> /home/nginxlog/cronlog/certican_remind_patient.log &
+
+#每天, 10:15 发送 多疾病患者发送用药核对，如果当天患者没填写，次日再次发送
+15 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/patientmedicinecheck_multiple_diseases_check_remind.php >> /home/nginxlog/cronlog/patientmedicinecheck_multiple_diseases_check_remind.log &
+
+#每天, 10:20 给昨日报到但是未填写当前治疗信息调查的患者再推送一次模板消息。
+20 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/treat_diagnose_remind.php >> /home/nginxlog/cronlog/treat_diagnose_remind.log &
+
+#每天, 10:25 给患者发送不良反应监测。
+25 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/padrmonitor_monitor_remind.php >> /home/nginxlog/cronlog/padrmonitor_monitor_remind.log &
+
+#每天, 10:30 发送邮件给运营, 秦燕项目：依维莫司患者的填写情况
+30 10 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/sendEmail_certican.php >> /home/nginxlog/cronlog/sendEmail_certican.log &
+
+#每天, 11:00, 给患者发送患者项目收集填写量表
+0 11 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/send_dc_patientplanitem.php >> /home/nginxlog/cronlog/send_dc_patientplanitem.log &
+
+#每天, 11:30, 发送邮件, 患者项目收集结果
+30 11 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/sendEmail_dc_project.php >> /home/nginxlog/cronlog/sendEmail_dc_project.log &
+
+#每天, 12:00 复诊前第3天, 发送给患者, 填写量表: 复诊已做检查项目明确
+0 12 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/revisittkt_pre_wangqian_ild.php >> /home/nginxlog/cronlog/revisittkt_pre_wangqian_ild.log &
+
+#每天, 12:01 第一次提醒未填写当天的【倍泰龙注射日记】的患者
+01 12 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/beitailong_send_paper_remind.php >> /home/nginxlog/cronlog/beitailong_send_paper_remind.log &
+
+#每天, 16:00 明日的复诊患者名单
+1 16 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/revisittkt_summary_dwx.php >> /home/nginxlog/cronlog/revisittkt_summary_dwx.log &
+
+#每天, 16:01 再次提醒未填写当天的【倍泰龙注射日记】的患者
+01 16 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/beitailong_send_paper_remind_again.php >> /home/nginxlog/cronlog/beitailong_send_paper_remind_again.log &
+
+#每天, 16:10 库存警戒值提醒
+10 16 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/stockitemnotice.php >> /home/nginxlog/cronlog/stockitemnotice.log &
+
+#每天, 18:10 对昨天早上6点(包括)到今天早上6点(不包括)的扫码关注但没报到的用户催报到
+10 18 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/cuibaodao_d2.php >> /home/nginxlog/cronlog/cuibaodao_d2.log &
+
+#每天, 18:20 发送给7天及以上的扫码关注但没报到的用户催报到, 每周发一次
+20 18 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/cuibaodao_d3.php >> /home/nginxlog/cronlog/cuibaodao_d3.log &
+
+#每天, 18:30 发送 就诊须知
+30 18 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/send_treatment_notice.php >> /home/nginxlog/cronlog/send_treatment_notice.log &
+
+#每天, 19:00, 给患者发送气道狭窄患者量表
+00 19 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/plan_qdxz_paper.php >> /home/nginxlog/cronlog/plan_qdxz_paper.log &
+
+#每天, 19:05, 每天19:05, 4月1日后入组的患者如果没有购买快速通行证的，在入组后第30天的下午7点钟自动发送提醒消息
+05 19 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/send_not_quick.php >> /home/nginxlog/cronlog/send_not_quick.log &
+
+#每天, 20:00 wxtask 提醒
+00 20 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/wxtask_notice.php >> /home/nginxlog/cronlog/wxtask_notice.log &
+
+#每天, 20:20 提醒做课程作业
+20 20 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/patientpgroupref_hwk_notice.php >> /home/nginxlog/cronlog/patientpgroupref_hwk_notice.log &
+
+#每天， 20:30 随即抓取运营当天完成的任务，生成optaskcheck
+30 20 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/create_optask_check.php >> /home/nginxlog/cronlog/create_optask_check.log &
+
+#每天, 22:00 检查wxusers表patientid的正确性
+00 22 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/dbfix_wxusers_patientid.php >> /home/nginxlog/cronlog/dbfix_wxusers_patientid.log &
+
+#每天, 23:00 全量修正所有的xpatientindex
+00 23 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/fixdb_xpatientindex.php 534567890 >> /home/nginxlog/cronlog/fixdb_xpatientindex.log &
+
+#每天, 23:10,入组姑息、晚期化疗的患者自动创建定期随访，复诊提醒
+10 23 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/chemo_create_optask.php >> /home/nginxlog/cronlog/chemo_create_optask.log &
+
+#每天, 23:25, 更新患者最新一个阶段的用药状态
+25 23 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/patientdrugstate_add.php >> /home/nginxlog/cronlog/patientdrugstate_add.log &
+
+#每天, 23:40 更新患者的用药状态
+40 23 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/set_patient_drug_status.php >> /home/nginxlog/cronlog/set_patient_drug_status.log &
+
+#每天, 23:50 数据修补doctors中first_patient_date
+50 23 * * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/daily/dbfix_doctors_first_patient_date.php >> /home/nginxlog/cronlog/dbfix_doctors_first_patient_date.log &
+
+########################
+#每周任务
+
+#每周一 00:30 非肿瘤医生周报数据统计
+30 0 * * 1 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/doctor_week_rpt/doctor_week_rpt_main.php >> /home/nginxlog/cronlog/doctor_week_rpt_main.log &
+
+#每周一 02:00 肿瘤医生周报数据统计
+30 0 * * 1 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/rpt_week_doctor_data_cancer.php >> /home/nginxlog/cronlog/rpt_week_doctor_data_cancer.log &
+
+#每周, 周一9:55, (肿瘤)运营周报
+00 10 * * 1 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/send_rpt_week_cancer_doctor.php >> /home/nginxlog/cronlog/send_rpt_week_cancer_doctor.log &
+
+#每周, 周一10:00, (非肿瘤)运营周报
+00 10 * * 1 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/rpt_summary_dwx.php >> /home/nginxlog/cronlog/rpt_summary_dwx.log &
+
+#每周，周二, 15:00, 发送多发性硬化症患者调查问卷到liangxiaoyu邮箱
+00 15 * * 2 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/sendDFXYHZAnswerSheetToMail.php >> /home/nginxlog/cronlog/sendDFXYHZAnswerSheetToMail.log &
+
+#每周，周五, 15:00, 发送多发性硬化症患者调查问卷到liangxiaoyu邮箱
+00 15 * * 5 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/sendDFXYHZAnswerSheetToMail.php >> /home/nginxlog/cronlog/sendDFXYHZAnswerSheetToMail.log &
+
+#每周, 周五, 患者周统计报告
+05 1 * * 5 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/rpt_week_patients_statistic.php >> /home/nginxlog/cronlog/rpt_week_patients_statistic.log &
+
+#每周, 周六, 患者感谢信通知
+00 19 * * 6 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/letter_summary_dwx.php >> /home/nginxlog/cronlog/letter_summary_dwx.log &
+
+#每周，周六 19:15 为患者发送文章
+15 19 * * 6 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/push_patient_edu.php >> /home/nginxlog/cronlog/push_patient_edu.log &
+
+#每周, 周六, 给杨莉医生推送疗效效果通知
+30 19 * * 6 www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/weekly/notice_yangli_dwx.php >> /home/nginxlog/cronlog/notice_yangli_dwx.log &
+
+########################
+#每月任务
+
+#每月, 每月1日, 09:01, 发送处方分析
+01 9 1 * * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/monthly/send_shoporder_month_rpt.php >> /home/nginxlog/cronlog/send_shoporder_month_rpt.log &
+
+#8-12月, 每月1日, 18:00 发肿瘤市场绩效
+0 18 1 8-12 * www /usr/bin/php /home/www/dev/fangcunyisheng.com/cron/monthly/sendmail_cancer_group.php >> /home/nginxlog/cronlog/sendmail_cancer_group.log &

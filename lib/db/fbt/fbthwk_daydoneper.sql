@@ -1,0 +1,1 @@
+SELECT fu.patientname, fu.phone, (SELECT COUNT(DISTINCT(DATE(createtime))) from fbt_hwkanswers fh WHERE fh.userid=fu.userid AND NOW() BETWEEN fh.createtime AND DATE_ADD(fh.createtime,INTERVAL 7 DAY))/10 AS ratio FROM fbt_users fu ORDER BY ratio DESC;

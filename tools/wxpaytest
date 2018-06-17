@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+require 'rest-client'
+
+url = 'http://api.fangcunyisheng.com/paygate/wxpaynotify'
+
+# TODO 增加签名测试功能
+# TODO 改为直接从数据库中取出数据的方式
+
+
+#necessray_env_arr = [ "out_trade_no" ]
+#necessray_env_arr.each do |x|
+#    value = ENV[x]
+#    if value.nil?
+#        puts "the necessray env value '#{x}' undefined"; exit;
+#    else
+#        eval "#{x} = '#{value}'"
+#    end
+#end
+
+xml = %Q{
+<xml>
+    <appid><![CDATA[wx55ca3b6e1c5c4ade]]></appid>
+    <bank_type><![CDATA[CMB_DEBIT]]></bank_type>
+    <cash_fee><![CDATA[14]]></cash_fee>
+    <dev_user><![CDATA[liu]]></dev_user>
+    <fee_type><![CDATA[CNY]]></fee_type>
+    <is_subscribe><![CDATA[Y]]></is_subscribe>
+    <mch_id><![CDATA[1248427301]]></mch_id>
+    <nonce_str><![CDATA[x73oz77p46353k2kmcdv7xnxby918v0e]]></nonce_str>
+    <openid><![CDATA[oX3J9s_kx0zZDpRSdpa47dnNmEXM]]></openid>
+    <out_trade_no><![CDATA[20151106110442100688161]]></out_trade_no>
+    <result_code><![CDATA[SUCCESS]]></result_code>
+    <return_code><![CDATA[SUCCESS]]></return_code>
+    <sign><![CDATA[96AFC4B925397CB09058BD86647B9D68]]></sign>
+    <time_end><![CDATA[20151106110455]]></time_end>
+    <total_fee>14</total_fee>
+    <trade_type><![CDATA[JSAPI]]></trade_type>
+    <transaction_id><![CDATA[1001380268201511061475048048]]></transaction_id>
+</xml>
+}
+
+result = RestClient.post url, xml, content_type: "xml", accept: "xml"
+
+puts result

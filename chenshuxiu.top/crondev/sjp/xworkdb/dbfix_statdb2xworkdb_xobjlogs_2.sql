@@ -1,0 +1,17 @@
+
+ update xobjlogs201611 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201612 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201701 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201702 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201703 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201704 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201705 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201706 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201707 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201708 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201709 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201710 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201711 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201712 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+ update xobjlogs201899 set randno_fix=1000 + CONV(left(md5(concat(objtype,':',objid)),2), 16, 10 ) 
+

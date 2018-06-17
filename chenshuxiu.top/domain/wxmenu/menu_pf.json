@@ -1,0 +1,46 @@
+{
+     "button":[
+     {	
+          "name": "我要",
+          "sub_button": [
+              {
+                  "type":"view",
+                  "name":"报到",
+                  "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd131aad78c97f4a2&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Fpatient%2Fnew%3Fgh%3dgh_5409c2ba053f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+              },
+              {
+                  "type":"view",
+                  "name":"记日记",
+                  "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd131aad78c97f4a2&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Fpatientnote%2Fadd%3Fgh%3dgh_5409c2ba053f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+              },
+            {
+                "name": "约复诊",
+                "type": "view",
+                "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd131aad78c97f4a2&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Frevisittkt%2Flist%3Fgh%3dgh_5409c2ba053f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+            },
+              {
+                  "type":"view",
+                  "name":"做评估",
+                  "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd131aad78c97f4a2&redirect_uri=http%3A%2F%2Fwx.fangcunyisheng.com%2Fpaper%2Findex%3Fgh%3dgh_5409c2ba053f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+              }
+          ]
+     },{
+          "name": "我的",
+          "sub_button": [
+              {"type": "view",
+               "name": "日记",
+               "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd131aad78c97f4a2&redirect_uri=http%3a%2f%2fwx.fangcunyisheng.com%2fpatientnote%2flist%3fgh%3dgh_5409c2ba053f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"},
+              {"type": "view",
+               "name": "资料",
+               "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd131aad78c97f4a2&redirect_uri=http%3a%2f%2fwx.fangcunyisheng.com%2fwxpicmsgmgr%2flist%3fgh%3dgh_5409c2ba053f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"}
+          ]
+     },{
+          "name": "管理疾病",
+          "sub_button": [
+              {"type": "view",
+               "name": "间质性肺纤维化患教",
+               "url": "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd131aad78c97f4a2&redirect_uri=http%3a%2f%2fwx.fangcunyisheng.com%2flesson%2fctdidl%3fgh%3dgh_5409c2ba053f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"}
+          ]
+     }
+   ]
+}

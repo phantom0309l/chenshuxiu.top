@@ -1,0 +1,240 @@
+alert:
+    template_id:
+        development: qio6VVAklruUkn7qvtdyVO0m10VqBwVGT26N_SavMOo
+        test: qio6VVAklruUkn7qvtdyVO0m10VqBwVGT26N_SavMOo
+        production: XpeNEAgOV55EuIhXXiyG2W5YIdnx_igHvoloSi-vXxw
+    url:
+        development: http://www.binggj.com/web/
+        test: http://www.binggj.com/web/
+        production: http://www.binggj.com/web/
+    content: |
+       {
+           "touser":"<%= touser %>",
+           "template_id":"<%= msg['template_id'][Rails.env] %>",
+           "url":"<%= msg['url'][Rails.env] %>",
+           "topcolor":"#FF0000",
+           "data":{
+                   "first": {
+                       "value":"系统出错: <%= input[:summary] %>",
+                       "color":"#000000"
+                   },
+                   "keyword1":{
+                       "value": "<%= input[:subsys] %>",
+                       "color":"#173177"
+                   },
+                   "keyword2": {
+                       "value":"<%= now %>",
+                       "color":"#173177"
+                   },
+                   "keyword3": {
+                       "value":"<%= input[:level] %>",
+                       "color":"#FF0000"
+                   },
+                   "remark":{
+                       "value":"请尽快处理。点击(详情)进入。",
+                       "color":"#000000"
+                   }
+           }
+       }
+appointment_notice:
+    template_id:
+        development: ugdDe_XWCTlHq4oLhLweGGnsVsia9MfwrYMlBOHQe-Y
+        test: qio6VVAklruUkn7qvtdyVO0m10VqBwVGT26N_SavMOo
+        production: D7ATz_Q0xU-r1TARnX3XMDkbjv2Z081R4MU11qv_pDE
+    url:
+        development: ""
+        test: http://www.binggj.com/web/
+        production: ""
+    content: |
+       {
+           "touser":"<%= touser %>",
+           "template_id":"<%= msg['template_id'][Rails.env] %>",
+           "url":"<%= msg['url'][Rails.env] %>",
+           "topcolor":"#FF0000",
+           "data":{
+                   "first": {
+                       "value":"您好，距离您本次复诊开药时间还有<%= input[:day] %>天，为确保当日就诊名额，请预约复诊。",
+                       "color":"#000000"
+                   },
+                   "keyword1":{
+                       "value": "<%= input[:patient_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword2": {
+                       "value":"<%= input[:hospital] %>",
+                       "color":"#173177"
+                   },
+                   "keyword3": {
+                       "value":"<%= input[:doctor_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword4": {
+                       "value":"<%= input[:drug_time] %>",
+                       "color":"#173177"
+                   },
+                   "remark":{
+                       "value":"打开微信公众号--方寸儿童管理服务平台，选择菜单中【我要】，点击【约复诊】进行操作，如有疑问，在微信号中与我们联系。",
+                       "color":"#000000"
+                   }
+           }
+       }
+appointment_back:
+    template_id:
+        development: ugdDe_XWCTlHq4oLhLweGGnsVsia9MfwrYMlBOHQe-Y
+        test: qio6VVAklruUkn7qvtdyVO0m10VqBwVGT26N_SavMOo
+        production: D7ATz_Q0xU-r1TARnX3XMDkbjv2Z081R4MU11qv_pDE
+    url:
+        development: http://www.fangcunyisheng.com/web/notice/visit_back
+        test: http://www.binggj.com/web/
+        production: http://www.binggj.com/web/notice/visit_back
+    content: |
+       {
+           "touser":"<%= touser %>",
+           "template_id":"<%= msg['template_id'][Rails.env] %>",
+           "url":"<%= msg['url'][Rails.env] %>?patient_id=<%=input[:patient_id]%>",
+           "topcolor":"#FF0000",
+           "data":{
+                   "first": {
+                       "value":"您好，为及时更新患者信息，点击详情完成本次复诊反馈表",
+                       "color":"#000000"
+                   },
+                   "keyword1":{
+                       "value": "<%= input[:patient_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword2": {
+                       "value":"<%= input[:hospital] %>",
+                       "color":"#173177"
+                   },
+                   "keyword3": {
+                       "value":"<%= input[:doctor_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword4": {
+                       "value":"<%= input[:book_date] %>",
+                       "color":"#173177"
+                   },
+                   "remark":{
+                       "value":"感谢您的使用，祝您身体健康！",
+                       "color":"#000000"
+                   }
+           }
+       }
+modify_drug_time:
+    template_id:
+        development: ugdDe_XWCTlHq4oLhLweGGnsVsia9MfwrYMlBOHQe-Y
+        test: qio6VVAklruUkn7qvtdyVO0m10VqBwVGT26N_SavMOo
+        production: D7ATz_Q0xU-r1TARnX3XMDkbjv2Z081R4MU11qv_pDE
+    url:
+        development: http://www.fangcunyisheng.com/web/notice/modify_drug_time
+        test: http://www.binggj.com/web/
+        production: http://www.binggj.com/web/notice/modify_drug_time
+    content: |
+       {
+           "touser":"<%= touser %>",
+           "template_id":"<%= msg['template_id'][Rails.env] %>",
+           "url":"<%= msg['url'][Rails.env] %>?patient_id=<%=input[:patient_id]%>&open_id=<%= touser %>",
+           "topcolor":"#FF0000",
+           "data":{
+                   "first": {
+                       "value":"您好，为方便您的下次复诊，请填写预计下一次回医院复诊/开药的时间，届时我们会提醒您复诊并且协助安排加号。",
+                       "color":"#000000"
+                   },
+                   "keyword1":{
+                       "value": "<%= input[:patient_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword2": {
+                       "value":"<%= input[:hospital] %>",
+                       "color":"#173177"
+                   },
+                   "keyword3": {
+                       "value":"<%= input[:doctor_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword4": {
+                       "value":"<%= input[:book_date] %>",
+                       "color":"#173177"
+                   },
+                   "remark":{
+                       "value":"点击详情填写下次回医院复诊/开药时间",
+                       "color":"#000000"
+                   }
+           }
+       }
+fbt_lesson:
+    template_id:
+        development: RZI7KO8aR8FbZscrE16cYIW7raxE-qMzYittJRI-t2I
+        test: qio6VVAklruUkn7qvtdyVO0m10VqBwVGT26N_SavMOo
+        production: RZI7KO8aR8FbZscrE16cYIW7raxE-qMzYittJRI-t2I
+    url:
+        development: ''
+        test: http://www.binggj.com/web/
+        production: ''
+    content: |
+       {
+           "touser":"<%= touser %>",
+           "template_id":"<%= msg['template_id'][Rails.env] %>",
+           "url":"<%= msg['url'][Rails.env] %>",
+           "topcolor":"#FF0000",
+           "data":{
+                   "first": {
+                       "value":"您报到参加的在线训练课程目前进入内测阶段，如有意愿参加，请添加微信号18500424970，以获取内测名额。如有疑问，请直接与在线训练管理员联系。",
+                       "color":"#000000"
+                   },
+                   "keyword1":{
+                       "value": "十周改善注意力",
+                       "color":"#173177"
+                   },
+                   "keyword2": {
+                       "value":"2015-08-13",
+                       "color":"#173177"
+                   },
+                   "keyword3": {
+                       "value":"七十课",
+                       "color":"#173177"
+                   },
+                   "keyword4": {
+                       "value":"方寸医生",
+                       "color":"#173177"
+                   }
+           }
+       }
+fcys_assess:
+    template_id:
+        development: B-935jLnrNUmeZvwSde2lPxR3mUCTfHXAbiD_CXe7F4
+        test: qio6VVAklruUkn7qvtdyVO0m10VqBwVGT26N_SavMOo
+        production: Sj8_DbuEuEvHUKwpJECSZz4apT61hCIrIwgogvESZrE
+    url:
+        development: http://www.fangcunyisheng.com/web/scale/index
+        test: http://www.binggj.com/web/
+        production: http://www.binggj.com/web/scale/index
+    content: |
+       {
+           "touser":"<%= touser %>",
+           "template_id":"<%= msg['template_id'][Rails.env] %>",
+           "url":"<%= msg['url'][Rails.env] %>?open_id=<%= touser %>",
+           "topcolor":"#FF0000",
+           "data":{
+                   "first": {
+                       "value":"<%= input[:patient_name] %>家长，本周评估尚未完成，请进行SNAP-IV评估和疗效评估。",
+                       "color":"#000000"
+                   },
+                   "keyword1":{
+                       "value": "<%= input[:patient_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword2": {
+                       "value":"<%= input[:doctor_name] %>",
+                       "color":"#173177"
+                   },
+                   "keyword3": {
+                       "value":"<%= input[:case] %>",
+                       "color":"#173177"
+                   },
+                   "remark":{
+                       "value":"如有疑问，请回复此消息。",
+                       "color":"#000000"
+                   }
+           }
+       }

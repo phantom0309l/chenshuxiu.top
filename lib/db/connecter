@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+configs = 
+    {
+        "development" => [],
+        "dev_liu" => ["root", "", "fcdev"],
+        nil => []
+    }
+
+config = configs[ENV["FC_ENV"]]
+
+print "mysql -u#{config[0]}#{' -p' + (cond= config[1]) if cond and !cond.empty?} -D #{config[2]}"
